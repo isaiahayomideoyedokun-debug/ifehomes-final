@@ -230,7 +230,7 @@ const supabaseFetch = async (endpoint, options = {}) => {
     const txt = await response.text();
     throw new Error(txt || 'Database execution failure');
   }
-  return response.status !== 204 ? response.json() : null;
+  return (response.status === 204 || response.status === 201) ? null : response.json();
 };
 
 export default function App() {
