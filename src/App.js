@@ -601,9 +601,20 @@ export default function App() {
                 )}
               </div>
               <div>
-                <a href={`tel:${item.phone}`} style={styles.primaryBtn}>
-                  📞 Contact Landlord
-                </a>
+              <div style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
+  <a href={`tel:${item.phone}`} style={styles.primaryBtn}>
+    📞 Call
+  </a>
+
+  <a 
+    href={`https://wa.me/${item.phone.startsWith('0') ? '234' + item.phone.slice(1) : item.phone}`} 
+    target="_blank" 
+    rel="noopener noreferrer"
+    style={{ ...styles.primaryBtn, backgroundColor: '#25D366' }}
+  >
+    WhatsApp
+  </a>
+</div>
                 <button
                   onClick={() => handleMarkHouseRented(item.id, item.phone)}
                   style={styles.rentedBtn}
