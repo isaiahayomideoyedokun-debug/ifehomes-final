@@ -330,16 +330,23 @@ export default function App() {
   };
 
   const handleMarkRoommateRented = async (id, storedPhone) => {
-    // 1. Ask for the phone number as a security check
-    const inputPhone = window.prompt("Security Check: Enter the phone number used to create this card to close your search:");
-  
-    // 2. If they hit "Cancel", just exit the function
+    const inputPhone = window.prompt("Security Check: Enter the phone number used to create this card:");
+    
     if (inputPhone === null) return;
   
-    // 3. Verify the number (using .trim() to ignore accidental spaces)
-    if (inputPhone.trim() === storedPhone.toString().trim()) {
+    // 1. Helper function to normalize numbers
+    const normalize = (phone) => {
+      let p = phone.toString().trim();
+      // If it starts with 0, replace 0 with 234
+      if (p.startsWith('0')) {
+        return '234' + p.substring(1);
+      }
+      return p;
+    };
+  
+    // 2. Compare the normalized versions of both numbers
+    if (normalize(inputPhone) === normalize(storedPhone)) {
       try {
-        // Your existing PATCH logic
         await supabaseFetch(`rest/v1/roommates?id=eq.${id}`, {
           method: 'PATCH',
           body: JSON.stringify({
@@ -348,12 +355,11 @@ export default function App() {
           }),
         });
         alert('Roommate search closed successfully!');
-        fetchData(); // Refresh the list
+        fetchData();
       } catch (err) {
         alert('Update failed: ' + err.message);
       }
     } else {
-      // If the number doesn't match, show an error
       alert("Incorrect phone number! Access denied.");
     }
   };
