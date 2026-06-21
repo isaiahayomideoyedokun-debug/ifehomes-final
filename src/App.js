@@ -329,23 +329,32 @@ export default function App() {
     }
   };
 
-  const handleMarkRoommateRented = async (id) => {
-    const confirm = window.confirm(
-      'Mark this roommate search as filled? It will be removed from directory.'
-    );
-    if (!confirm) return;
-    try {
-      await supabaseFetch(`rest/v1/roommates?id=eq.${id}`, {
-        method: 'PATCH',
-        body: JSON.stringify({
-          status: 'Rented',
-          rented_at: new Date().toISOString(),
-        }),
-      });
-      alert('🔒 Roommate search closed successfully!');
-      fetchData();
-    } catch (err) {
-      alert('Update failed: ' + err.message);
+  const handleMarkRoommateRented = async (id, storedPhone) => {
+    // 1. Ask for the phone number as a security check
+    const inputPhone = window.prompt("Security Check: Enter the phone number used to create this card to close your search:");
+  
+    // 2. If they hit "Cancel", just exit the function
+    if (inputPhone === null) return;
+  
+    // 3. Verify the number (using .trim() to ignore accidental spaces)
+    if (inputPhone.trim() === storedPhone.toString().trim()) {
+      try {
+        // Your existing PATCH logic
+        await supabaseFetch(`rest/v1/roommates?id=eq.${id}`, {
+          method: 'PATCH',
+          body: JSON.stringify({
+            status: 'Rented',
+            rented_at: new Date().toISOString(),
+          }),
+        });
+        alert('Roommate search closed successfully!');
+        fetchData(); // Refresh the list
+      } catch (err) {
+        alert('Update failed: ' + err.message);
+      }
+    } else {
+      // If the number doesn't match, show an error
+      alert("Incorrect phone number! Access denied.");
     }
   };
 
@@ -717,7 +726,7 @@ export default function App() {
                   💬 WhatsApp
                 </a>
                 <button
-                  onClick={() => handleMarkRoommateRented(item.id)}
+                  onClick={() => handleMarkRoommateRented(item.id, item.phone)}
                   style={styles.rentedBtn}
                 >
                   🚫 Mark Filled
