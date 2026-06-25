@@ -267,28 +267,27 @@ const [isViewingMyListings, setIsViewingMyListings] = useState(false);
   }, [view]);
 
   const fetchData = async () => {
+    setLoading(true);
     try {
-      setLoading(true);
       if (view === 'houses') {
-        const data = await supabaseFetch(
-          'rest/v1/listings?select=*&order=id.desc',
-          {
-            headers: { Prefer: 'return=representation' },
-          }
-        );
-
+        const { data, error } = await supabase
+          .from('listings')
+          .select('*')
+          .order('id', { ascending: false });
+  
+        if (error) throw error;
         setListings((data || []).filter((item) => item.status !== 'Rented'));
       } else if (view === 'roommates') {
-        const data = await supabaseFetch(
-          'rest/v1/roommates?select=*&order=id.desc',
-          {
-            headers: { Prefer: 'return=representation' },
-          }
-        );
+        const { data, error } = await supabase
+          .from('roommates')
+          .select('*')
+          .order('id', { ascending: false });
+  
+        if (error) throw error;
         setRoommates((data || []).filter((item) => item.status !== 'Rented'));
       }
     } catch (err) {
-      console.error(err);
+      console.error("Error fetching data:", err);
     } finally {
       setLoading(false);
     }
