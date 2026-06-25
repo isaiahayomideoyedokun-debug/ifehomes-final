@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { createClient } from '@supabase/supabase-js';
 
 // Centralized Constants
 const SUPABASE_URL = 'https://fouzmbtgqfywtppdwows.supabase.co';
 const SUPABASE_ANON_KEY =
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZvdXptYnRncWZ5d3RwcGR3b3dzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0Mzc1ODgsImV4cCI6MjA5NzAxMzU4OH0.ZElNJoGX2yVior8NRJ3tyb1lHnUrZSMAsGCm20w1crA';
+  const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // Premium OAU Theme Stylesheet
 const styles = {
