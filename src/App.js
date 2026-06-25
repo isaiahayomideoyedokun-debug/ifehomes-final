@@ -240,6 +240,9 @@ export default function App() {
   const [roommates, setRoommates] = useState([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
+  const [phoneInput, setPhoneInput] = useState('');
+const [myListings, setMyListings] = useState([]);
+const [isViewingMyListings, setIsViewingMyListings] = useState(false);
 
   // Forms State
   const [houseForm, setHouseForm] = useState({
@@ -361,6 +364,18 @@ export default function App() {
       }
     } else {
       alert("Incorrect phone number! Access denied.");
+    }
+  };
+  const fetchMyListings = async () => {
+    const normalizedPhone = phoneInput.trim().startsWith('0') ? '234' + phoneInput.trim().substring(1) : phoneInput.trim();
+    const { data, error } = await supabase.from('roommates').select('*').eq('phone', normalizedPhone);
+    if (error) {
+      alert("Error fetching: " + error.message);
+    } else if (data.length === 0) {
+      alert("No listings found for this number.");
+    } else {
+      setMyListings(data);
+      setIsViewingMyListings(true);
     }
   };
 
@@ -486,6 +501,19 @@ export default function App() {
           The Premium OAU Off-Campus Housing & Roommate Finder Network
         </p>
       </header>
+      <div style={{ margin: '20px', padding: '20px', background: '#f4f4f4' }}>
+  <h3>View My Listings</h3>
+  <input 
+    type="text" 
+    placeholder="Enter your phone number" 
+    value={phoneInput}
+    onChange={(e) => setPhoneInput(e.target.value)} 
+  />
+  <button onClick={fetchMyListings}>Search</button>
+  {isViewingMyListings && (
+    <button onClick={() => setIsViewingMyListings(false)}>Back to All</button>
+  )}
+</div>
 
       <div style={styles.tabsContainer}>
         <button
@@ -644,7 +672,7 @@ export default function App() {
 
       {!loading && view === 'roommates' && (
         <div style={styles.grid}>
-          {filteredRoommates.map((item) => (
+          {(isViewingMyListings ? myListings : filteredRoommates).map((item) => (
             <div key={item.id} style={styles.card}>
               <div>
                 <div
