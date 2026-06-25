@@ -311,21 +311,24 @@ const [isViewingMyListings, setIsViewingMyListings] = useState(false);
 
     try {
       setLoading(true);
-      await supabaseFetch(`rest/v1/listings?id=eq.${id}`, {
-        method: 'PATCH',
-        body: JSON.stringify({
+      const { error } = await supabase
+        .from('listings')
+        .update({ 
           status: 'Rented',
-          rented_at: new Date().toISOString(),
-        }),
-      });
+          rented_at: new Date().toISOString() 
+        })
+        .eq('id', id);
+  
+      if (error) throw error;
+      
       alert('🔒 House listing successfully removed from market!');
       fetchData();
     } catch (err) {
-      alert('❌ Update failed: ' + err.message);
+      console.error("Error updating status:", err);
+      alert("Update failed: " + err.message);
     } finally {
       setLoading(false);
     }
-  };
 
   const handleMarkRoommateRented = async (id, storedPhone) => {
     const inputPhone = window.prompt("Security Check: Enter the phone number used to create this card:");
@@ -345,17 +348,22 @@ const [isViewingMyListings, setIsViewingMyListings] = useState(false);
     // 2. Compare the normalized versions of both numbers
     if (normalize(inputPhone) === normalize(storedPhone)) {
       try {
-        await supabaseFetch(`rest/v1/roommates?id=eq.${id}`, {
-          method: 'PATCH',
-          body: JSON.stringify({
+        setLoading(true);
+        const { error } = await supabase
+          .from('roommates')
+          .update({ 
             status: 'Rented',
-            rented_at: new Date().toISOString(),
-          }),
-        });
-        alert('Roommate search closed successfully!');
+            rented_at: new Date().toISOString() 
+          })
+          .eq('id', id);
+    
+        if (error) throw error;
+    
+        alert('🔒 Roommate listing successfully removed from market!');
         fetchData();
       } catch (err) {
-        alert('Update failed: ' + err.message);
+        console.error("Error updating status:", err);
+        alert("Update failed: " + err.message);
       }
     } else {
       alert("Incorrect phone number! Access denied.");
