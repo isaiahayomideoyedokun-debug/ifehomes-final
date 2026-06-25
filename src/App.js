@@ -1029,6 +1029,6 @@ const [isViewingMyListings, setIsViewingMyListings] = useState(false);
           </form>
         </div>
       )}
-    </div>
+    
   
 
